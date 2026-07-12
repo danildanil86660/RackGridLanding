@@ -14,7 +14,7 @@
 |------|-----------|
 | `index.html` | Страница (экспорт `RackGrid.dc.html` дизайнера + добавленные `<title>`/meta/OG/favicon и хук `window.__resources`) |
 | `support.js` | dc-runtime (сгенерирован, **не редактировать вручную**) |
-| `assets/` | Скриншоты: `shot-*-{dark,light}.webp` (десктоп, пары под тему) + `phone-*.png` (мобайл) |
+| `assets/` | Скриншоты: `shot-*-{dark,light}.webp` (десктоп) + `phone-*-{dark,light}.png` (мобайл) — обе пары свапаются под тему через `display:var(--d-dark)`/`var(--d-light)` |
 | `vendor/` | Самостоятельно захостенные React 18.3.1, ReactDOM 18.3.1, Babel standalone 7.29.0 |
 | `.nojekyll` | Отключает обработку Jekyll на GitHub Pages |
 
