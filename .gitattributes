@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.webp binary
+*.png binary
+vendor/** -text
+support.js -text

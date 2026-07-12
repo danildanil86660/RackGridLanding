@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RackGrid — система управления майнинг-фермой на вашем сервере</title>
+<meta name="description" content="RackGrid — платформа мониторинга и управления ASIC на уровне железа: иерархия площадок, авто-обнаружение оборудования в сети, тепловые карты стоек и мгновенные алерты. Тысячи устройств на одном сервере — на вашем железе.">
+<meta name="theme-color" content="#0A0C10">
+<link rel="canonical" href="https://danildanil86660.github.io/RackGridLanding/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%232366EF%22/><text x=%2250%22 y=%2272%22 font-size=%2266%22 font-family=%22Arial,sans-serif%22 font-weight=%22800%22 fill=%22white%22 text-anchor=%22middle%22>R</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RackGrid — управление майнинг-фермой на вашем сервере">
+<meta property="og:description" content="Мониторинг и управление ASIC на уровне железа. Тысячи устройств на одном сервере — и ни байта данных о ферме наружу.">
+<meta property="og:url" content="https://danildanil86660.github.io/RackGridLanding/">
+<meta property="og:image" content="https://danildanil86660.github.io/RackGridLanding/assets/shot-dashboard-dark.webp">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+/* Self-hosted runtime deps — vendored React/ReactDOM/Babel, чтобы не зависеть от внешнего CDN (unpkg).
+   support.js читает window.__resources[url] и грузит по локальному пути без integrity. */
+window.__resources = {
+  "https://unpkg.com/react@18.3.1/umd/react.production.min.js": "vendor/react.production.min.js",
+  "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js": "vendor/react-dom.production.min.js",
+  "https://unpkg.com/@babel/standalone@7.29.0/babel.min.js": "vendor/babel.min.js"
+};
+</script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:#0A0C10;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  [data-rg] *{box-sizing:border-box;}
+  [data-rg]{
+    --bg:#0A0C10;--raised:#11141A;--sunken:#07090D;--b1:#1A1E26;--b2:#262B36;--bstrong:#3A424F;
+    --fg1:#F1F3F6;--fg2:#C2C8D1;--fg3:#8B93A1;--fg4:#5B6270;
+    --brand:#2366EF;--brand-cyan:#1C96D8;--brand-hover:#3B82F6;
+    --grad:linear-gradient(90deg,#1C96D8,#2366EF);--grad-diag:linear-gradient(135deg,#1C96D8 0%,#2366EF 100%);
+    --tint:rgba(35,102,239,.12);--tint2:rgba(35,102,239,.28);
+    --ok:#10B981;--ok-fg:#4ADE8A;--warn:#F59E0B;--warn-fg:#F8C252;--crit:#EF4444;--crit-fg:#FB7070;
+    --d-dark:block;--d-light:none;
+    --shadow:0 1px 2px rgba(0,0,0,.4);--shadow2:0 18px 50px -12px rgba(0,0,0,.7);
+    --dot:rgba(140,170,210,.05);--headbg:rgba(10,12,16,.72);
+  }
+  [data-rg][data-theme="light"]{
+    --bg:#F7F8FA;--raised:#FFFFFF;--sunken:#EEF0F3;--b1:#E4E7EC;--b2:#D3D8E0;--bstrong:#353B47;
+    --fg1:#11141A;--fg2:#353B47;--fg3:#6B7280;--fg4:#9BA3AF;
+    --brand-hover:#1B54D6;
+    --tint:#E8F0FE;--tint2:#C9DBFC;
+    --ok-fg:#05704E;--warn-fg:#8A5A0B;--crit-fg:#B42020;
+    --d-dark:none;--d-light:block;
+    --shadow:0 1px 2px rgba(17,20,26,.06);--shadow2:0 18px 44px -16px rgba(17,20,26,.22);
+    --dot:rgba(16,21,30,.05);--headbg:rgba(247,248,250,.78);
+  }
+  [data-rg] a{color:var(--brand);text-decoration:none;transition:color .12s ease;}
+  [data-rg] a:hover{color:var(--brand-hover);}
+  [data-rg] ::selection{background:var(--tint2);}
+  @keyframes rgpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.82)}}
+</style>
+</helmet>
+
+<div data-rg data-theme="{{ theme }}" style="min-height:100vh;background:radial-gradient(circle at 1px 1px,var(--dot) 1px,transparent 0) 0 0/28px 28px,var(--bg);color:var(--fg1);line-height:1.6;font-size:16px;">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position:sticky;top:0;z-index:40;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:var(--headbg);border-bottom:1px solid var(--b1);">
+    <div style="max-width:1220px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+      <a href="#top" style="display:flex;align-items:center;gap:10px;color:var(--fg1);font-weight:700;letter-spacing:.01em;">
+        <span style="width:28px;height:28px;border-radius:8px;flex:none;background:var(--grad-diag);display:grid;place-items:center;color:#fff;font-weight:800;font-size:.9rem;box-shadow:0 4px 14px -4px var(--brand);">R</span>
+        <span style="font-size:1.05rem;">RackGrid</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);border:1px solid var(--b2);border-radius:5px;padding:3px 6px;">свой сервер</span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:26px;">
+        <a href="#features" style="color:var(--fg3);font-size:.9rem;font-weight:500;">Возможности</a>
+        <a href="#compare" style="color:var(--fg3);font-size:.9rem;font-weight:500;">Свой сервер</a>
+        <a href="#plans" style="color:var(--fg3);font-size:.9rem;font-weight:500;">Форматы</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button onClick="{{ toggle }}" type="button" aria-label="Сменить тему" style="width:36px;height:36px;display:grid;place-items:center;background:transparent;color:var(--fg3);border:1px solid var(--b2);border-radius:8px;cursor:pointer;transition:color .12s,border-color .12s;" style-hover="color:var(--fg1);border-color:var(--bstrong);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:var(--d-dark);"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:var(--d-light);"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+        <a href="https://danildanil86660.github.io/RackGridLiveDemo/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;color:var(--fg1);font-weight:600;font-size:.85rem;padding:9px 14px;border:1px solid var(--b2);border-radius:8px;transition:border-color .12s;" style-hover="border-color:var(--bstrong);">Живое демо ↗</a>
+        <a href="https://t.me/dan0712" style="display:inline-flex;align-items:center;gap:6px;background:var(--grad-diag);color:#fff;font-weight:600;font-size:.85rem;padding:10px 16px;border-radius:8px;box-shadow:0 6px 18px -8px var(--brand);">Запросить демо</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============ HERO ============ -->
+    <section style="max-width:1220px;margin:0 auto;padding:clamp(40px,6vw,72px) 24px clamp(28px,4vw,44px);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:clamp(28px,4vw,54px);align-items:center;">
+        <div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;display:inline-flex;align-items:center;gap:10px;"><span style="width:24px;height:1px;background:var(--tint2);"></span>Система управления майнинг-фермой</span>
+          <h1 style="font-size:clamp(2.1rem,5vw,3.5rem);font-weight:800;line-height:1.06;letter-spacing:-.025em;color:var(--fg1);margin:18px 0 0;text-wrap:balance;">Вся ферма под контролем&nbsp;— на вашем сервере.</h1>
+          <p style="font-size:1.08rem;color:var(--fg2);margin:20px 0 0;max-width:34em;">RackGrid — платформа мониторинга и управления ASIC на уровне железа. Иерархия площадок, авто-обнаружение оборудования в сети, тепловые карты стоек и мгновенные алерты. Тысячи устройств на одном сервере — и ни байта данных о ферме наружу.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+            <a href="https://t.me/dan0712" style="display:inline-flex;align-items:center;gap:9px;background:var(--grad-diag);color:#fff;font-weight:600;font-size:.98rem;padding:13px 22px;border-radius:9px;box-shadow:0 10px 26px -10px var(--brand);transition:filter .12s;" style-hover="filter:brightness(1.08);">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.2.2-.5.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.2 13.5l-4.5-1.4c-1-.3-1-1 .2-1.4l17.6-6.8c.8-.3 1.5.2 1.4 1.4Z"/></svg>
+              Написать в Telegram
+            </a>
+            <a href="https://danildanil86660.github.io/RackGridLiveDemo/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--fg1);font-weight:600;font-size:.98rem;padding:13px 20px;border-radius:9px;border:1px solid var(--b2);transition:border-color .12s;" style-hover="border-color:var(--bstrong);">Открыть живое демо ↗</a>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--fg3);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:7px 11px;"><b style="color:var(--fg1);">Antminer</b> · Whatsminer · Vnish</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--fg3);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:7px 11px;">до <b style="color:var(--fg1);">тысяч</b> ASIC / сервер</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--fg3);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:7px 11px;">лицензия <b style="color:var(--fg1);">за оборудование</b></span>
+          </div>
+        </div>
+
+        <!-- app window with dashboard shot -->
+        <div style="border:1px solid var(--b2);border-radius:14px;overflow:hidden;background:var(--raised);box-shadow:var(--shadow2);">
+          <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--b1);background:var(--sunken);">
+            <span style="width:11px;height:11px;border-radius:50%;background:#FF5F57;"></span>
+            <span style="width:11px;height:11px;border-radius:50%;background:#FEBC2E;"></span>
+            <span style="width:11px;height:11px;border-radius:50%;background:#28C840;"></span>
+            <span style="margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.02em;color:var(--fg3);display:inline-flex;align-items:center;gap:7px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--ok);animation:rgpulse 1.8s var(--ease-out) infinite;"></span>rackgrid // дашборд · online</span>
+          </div>
+          <img src="assets/shot-dashboard-dark.webp" alt="Дашборд RackGrid: хешрейт, здоровье парка, потребление, ошибки" style="display:var(--d-dark);width:100%;height:auto;">
+          <img src="assets/shot-dashboard-light.webp" alt="Дашборд RackGrid" style="display:var(--d-light);width:100%;height:auto;">
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LIVE KPI STRIP ============ -->
+    <section style="max-width:1220px;margin:0 auto;padding:0 24px clamp(40px,6vw,64px);">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3);font-weight:600;">Живая телеметрия · демо-парк 315 ASIC</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--fg3);display:inline-flex;align-items:center;gap:7px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--ok);animation:rgpulse 1.8s ease infinite;"></span>обновляется каждые 2 c</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:14px;">
+        <!-- hashrate gradient tile -->
+        <div style="background:var(--grad-diag);border-radius:12px;padding:18px 18px 14px;color:#fff;position:relative;overflow:hidden;box-shadow:0 12px 30px -14px var(--brand);">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.8);font-weight:600;">Хешрейт · 5 мин</div>
+          <div style="margin-top:8px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;"><span style="font-size:2rem;">{{ hr }}</span><span style="font-size:.85rem;font-weight:500;margin-left:5px;opacity:.85;">PH/s</span></div>
+          <div style="margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:rgba(255,255,255,.9);">▲ +1.8% / ч</div>
+          <svg viewBox="0 0 260 60" preserveAspectRatio="none" style="width:100%;height:44px;margin-top:8px;display:block;overflow:visible;"><polyline points="{{ sparkPts }}" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+        <!-- online -->
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:18px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3);font-weight:600;">ASIC онлайн</div>
+          <div style="margin-top:8px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;color:var(--fg1);"><span style="font-size:2rem;">{{ on }}</span><span style="font-size:.85rem;font-weight:500;color:var(--fg3);margin-left:3px;">/ 315</span></div>
+          <div style="height:5px;border-radius:3px;background:var(--sunken);margin-top:12px;overflow:hidden;"><div style="height:100%;width:{{ onPct }}%;background:var(--ok);border-radius:3px;transition:width .6s ease;"></div></div>
+          <div style="margin-top:9px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--crit-fg);">{{ off }} оффлайн · 4 ошибок</div>
+        </div>
+        <!-- power -->
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:18px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3);font-weight:600;">Потребление</div>
+          <div style="margin-top:8px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;color:var(--fg1);"><span style="font-size:2rem;">{{ pw }}</span><span style="font-size:.85rem;font-weight:500;color:var(--fg3);margin-left:5px;">MW</span></div>
+          <div style="margin-top:22px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--fg3);"><span style="color:var(--fg1);font-weight:600;">{{ cost }} $</span> / сутки</div>
+        </div>
+        <!-- efficiency -->
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:18px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3);font-weight:600;">Эффективность</div>
+          <div style="margin-top:8px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;color:var(--fg1);"><span style="font-size:2rem;">{{ ef }}</span><span style="font-size:.85rem;font-weight:500;color:var(--fg3);margin-left:5px;">J/TH</span></div>
+          <div style="margin-top:22px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--ok-fg);">PUE 1.10</div>
+        </div>
+        <!-- errors -->
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:18px;border-left:2px solid var(--crit);">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3);font-weight:600;">Активные ошибки</div>
+          <div style="margin-top:8px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;color:var(--fg1);font-size:2rem;">{{ er }}</div>
+          <div style="margin-top:22px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--fg3);"><span style="color:var(--crit-fg);">{{ erCrit }} крит</span> · {{ erWarn }} warn</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SUPPORT STRIP ============ -->
+    <div style="border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);background:var(--raised);">
+      <div style="max-width:1220px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg4);font-weight:600;flex:none;">Оборудование и протоколы</span>
+        <div style="display:flex;align-items:center;gap:26px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--fg2);font-weight:500;">
+          <span>Antminer</span><span style="color:var(--fg4);">/</span><span>Whatsminer</span><span style="color:var(--fg4);">/</span><span>Vnish</span><span style="color:var(--fg4);">/</span><span>cgminer · TCP</span><span style="color:var(--fg4);">/</span><span>PetBit · HTTP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ FEATURES ============ -->
+    <section id="features" style="max-width:1220px;margin:0 auto;padding:clamp(56px,8vw,96px) 24px;">
+      <div style="margin-bottom:36px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;display:inline-flex;align-items:center;gap:10px;"><span style="width:24px;height:1px;background:var(--tint2);"></span>Возможности</span>
+        <h2 style="font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700;line-height:1.12;letter-spacing:-.02em;color:var(--fg1);margin:14px 0 0;max-width:20em;">Всё для управления фермой в одном месте</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;">
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:24px;transition:border-color .15s;" style-hover="border-color:var(--b2);">
+          <div style="width:40px;height:40px;border-radius:10px;background:var(--tint);display:grid;place-items:center;color:var(--brand-hover);margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:21px;height:21px;"><path d="M3 12h3l2-6 4 12 2-6h4"/></svg></div>
+          <h3 style="font-size:1.12rem;font-weight:600;color:var(--fg1);margin:0;">Мониторинг на уровне железа</h3>
+          <p style="color:var(--fg2);margin:9px 0 0;font-size:.95rem;">Хешрейт, температура, потребление, эффективность (J/TH), аптайм и прошивка — телеметрия прямо с устройств, а не только из API пула.</p>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:24px;transition:border-color .15s;" style-hover="border-color:var(--b2);">
+          <div style="width:40px;height:40px;border-radius:10px;background:var(--tint);display:grid;place-items:center;color:var(--brand-hover);margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:21px;height:21px;"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01"/></svg></div>
+          <h3 style="font-size:1.12rem;font-weight:600;color:var(--fg1);margin:0;">Иерархия площадок</h3>
+          <p style="color:var(--fg2);margin:9px 0 0;font-size:.95rem;">Площадка → контейнер → стойка → ASIC. Наглядная навигация, в которой не теряешься даже на тысячах воркеров.</p>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:24px;transition:border-color .15s;" style-hover="border-color:var(--b2);">
+          <div style="width:40px;height:40px;border-radius:10px;background:var(--tint);display:grid;place-items:center;color:var(--brand-hover);margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:21px;height:21px;"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+          <h3 style="font-size:1.12rem;font-weight:600;color:var(--fg1);margin:0;">Сканер сети</h3>
+          <p style="color:var(--fg2);margin:9px 0 0;font-size:.95rem;">Автопоиск ASIC по IP-диапазону: тип, модель, пул, хешрейт — и добавление в систему в один клик. Никакого ручного ввода сотен адресов.</p>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:24px;transition:border-color .15s;" style-hover="border-color:var(--b2);">
+          <div style="width:40px;height:40px;border-radius:10px;background:var(--tint);display:grid;place-items:center;color:var(--brand-hover);margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:21px;height:21px;"><path d="M12 3v6m0 0-2.5-2.5M12 9l2.5-2.5"/><path d="M5 13h14l-1.5 7h-11z"/></svg></div>
+          <h3 style="font-size:1.12rem;font-weight:600;color:var(--fg1);margin:0;">Тепловые карты стоек</h3>
+          <p style="color:var(--fg2);margin:9px 0 0;font-size:.95rem;">Вид стойки «сетка / полки / тепло». Перегрев виден на схеме раньше, чем воркер отвалится.</p>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:24px;transition:border-color .15s;" style-hover="border-color:var(--b2);">
+          <div style="width:40px;height:40px;border-radius:10px;background:var(--tint);display:grid;place-items:center;color:var(--brand-hover);margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:21px;height:21px;"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></div>
+          <h3 style="font-size:1.12rem;font-weight:600;color:var(--fg1);margin:0;">Алерты, где удобно</h3>
+          <p style="color:var(--fg2);margin:9px 0 0;font-size:.95rem;">Уведомления в Telegram, на почту и в другие мессенджеры. Порог сработал — вы уже знаете, не дожидаясь простоя.</p>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:12px;padding:24px;transition:border-color .15s;" style-hover="border-color:var(--b2);">
+          <div style="width:40px;height:40px;border-radius:10px;background:var(--tint);display:grid;place-items:center;color:var(--brand-hover);margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:21px;height:21px;"><path d="M12 3 4 6v5c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h3 style="font-size:1.12rem;font-weight:600;color:var(--fg1);margin:0;">Данные остаются у вас</h3>
+          <p style="color:var(--fg2);margin:9px 0 0;font-size:.95rem;">Ставится на ваш сервер и работает в изолированной сети. Размер, локация и хешрейт фермы не уходят наружу.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCANNER SPLIT ============ -->
+    <section id="scanner" style="max-width:1220px;margin:0 auto;padding:0 24px clamp(56px,8vw,88px);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:clamp(28px,4vw,52px);align-items:center;">
+        <div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;display:inline-flex;align-items:center;gap:10px;"><span style="width:24px;height:1px;background:var(--tint2);"></span>Сканер сети</span>
+          <h3 style="font-size:clamp(1.4rem,2.6vw,1.9rem);font-weight:700;letter-spacing:-.02em;color:var(--fg1);margin:14px 0 0;">Развернуть ферму на сотни машин — за минуты</h3>
+          <p style="color:var(--fg2);margin:14px 0 0;">Задайте IP-диапазон и порты — RackGrid найдёт все ASIC, определит тип и модель, покажет статус, пул и хешрейт. Останется отметить нужные и добавить в систему.</p>
+          <ul style="list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:11px;">
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span>Автоопределение <b style="color:var(--fg1);">Antminer, Whatsminer, Vnish</b> и других.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span>Настраиваемые порты, таймаут и до <b style="color:var(--fg1);">128 потоков</b> сканирования.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span>Добавление найденного оборудования <b style="color:var(--fg1);">в один клик</b>.</span></li>
+          </ul>
+          <div style="display:inline-flex;align-items:baseline;gap:10px;margin-top:22px;padding:12px 16px;background:var(--raised);border:1px solid var(--b1);border-radius:10px;"><b style="font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--fg1);font-variant-numeric:tabular-nums;">65 536</b><span style="font-size:.82rem;color:var(--fg3);">IP-адресов за один скан</span></div>
+        </div>
+        <div style="border:1px solid var(--b2);border-radius:14px;overflow:hidden;background:var(--raised);box-shadow:var(--shadow2);">
+          <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--b1);background:var(--sunken);"><span style="width:11px;height:11px;border-radius:50%;background:#FF5F57;"></span><span style="width:11px;height:11px;border-radius:50%;background:#FEBC2E;"></span><span style="width:11px;height:11px;border-radius:50%;background:#28C840;"></span><span style="margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--fg3);">rackgrid // сканер сети</span></div>
+          <img src="assets/shot-scanner-dark.webp" alt="Сканер сети RackGrid" style="display:var(--d-dark);width:100%;height:auto;">
+          <img src="assets/shot-scanner-light.webp" alt="Сканер сети RackGrid" style="display:var(--d-light);width:100%;height:auto;">
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RACK SPLIT (reversed) ============ -->
+    <section style="max-width:1220px;margin:0 auto;padding:0 24px clamp(56px,8vw,88px);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:clamp(28px,4vw,52px);align-items:center;">
+        <div style="border:1px solid var(--b2);border-radius:14px;overflow:hidden;background:var(--raised);box-shadow:var(--shadow2);order:2;">
+          <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--b1);background:var(--sunken);"><span style="width:11px;height:11px;border-radius:50%;background:#FF5F57;"></span><span style="width:11px;height:11px;border-radius:50%;background:#FEBC2E;"></span><span style="width:11px;height:11px;border-radius:50%;background:#28C840;"></span><span style="margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--fg3);">rackgrid // стойка · вид спереди</span></div>
+          <img src="assets/shot-rack-dark.webp" alt="Вид стойки RackGrid" style="display:var(--d-dark);width:100%;height:auto;">
+          <img src="assets/shot-rack-light.webp" alt="Вид стойки RackGrid" style="display:var(--d-light);width:100%;height:auto;">
+        </div>
+        <div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;display:inline-flex;align-items:center;gap:10px;"><span style="width:24px;height:1px;background:var(--tint2);"></span>Иерархия и стойки</span>
+          <h3 style="font-size:clamp(1.4rem,2.6vw,1.9rem);font-weight:700;letter-spacing:-.02em;color:var(--fg1);margin:14px 0 0;">От площадки целиком до конкретного слота</h3>
+          <p style="color:var(--fg2);margin:14px 0 0;">Оборудование сгруппировано так, как ферма устроена физически. По каждому ASIC — хешрейт, температура, мощность, аптайм, прошивка, IP и слот; действия «в сервис», «привязать владельца», «удалить».</p>
+          <ul style="list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:11px;">
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span>Вид стойки <b style="color:var(--fg1);">сетка / полки / тепло</b> с цветовым статусом слотов.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span>Статусы <b style="color:var(--fg1);">онлайн / предупреждение / ошибка / нет связи</b>.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span>Быстрый поиск по ASIC, стойке и контейнеру.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOSTING CALLOUT ============ -->
+    <section style="max-width:1220px;margin:0 auto;padding:0 24px clamp(56px,8vw,88px);">
+      <div style="background:var(--raised);border:1px solid var(--b1);border-radius:16px;padding:clamp(28px,4vw,44px);display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,48px);align-items:center;">
+        <div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;display:inline-flex;align-items:center;gap:10px;"><span style="width:24px;height:1px;background:var(--tint2);"></span>Для хостинга оборудования</span>
+          <h3 style="font-size:clamp(1.4rem,2.6vw,1.8rem);font-weight:700;letter-spacing:-.02em;color:var(--fg1);margin:14px 0 0;">Каждый клиент видит только свои ASIC</h3>
+          <p style="color:var(--fg2);margin:14px 0 0;">Роли и привязка владельцев делают RackGrid готовым для хостинг-площадок: разграничение доступа по площадкам, отдельный кабинет клиента без лишнего, полный контроль у администратора.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;background:var(--sunken);border:1px solid var(--b1);border-radius:10px;padding:14px 16px;"><span style="font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-hover);background:var(--tint);border-radius:5px;padding:4px 8px;flex:none;font-weight:600;">админ</span><span style="font-size:.9rem;color:var(--fg2);"><b style="color:var(--fg1);">Супер-админ.</b> Полный доступ, управление пользователями и лицензией.</span></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;background:var(--sunken);border:1px solid var(--b1);border-radius:10px;padding:14px 16px;"><span style="font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-hover);background:var(--tint);border-radius:5px;padding:4px 8px;flex:none;font-weight:600;">площадка</span><span style="font-size:.9rem;color:var(--fg2);"><b style="color:var(--fg1);">Админ площадок.</b> Стойки, контейнеры и ASIC на выбранных площадках.</span></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;background:var(--sunken);border:1px solid var(--b1);border-radius:10px;padding:14px 16px;"><span style="font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-hover);background:var(--tint);border-radius:5px;padding:4px 8px;flex:none;font-weight:600;">клиент</span><span style="font-size:.9rem;color:var(--fg2);"><b style="color:var(--fg1);">Пользователь.</b> Видит только привязанные к нему ASIC — идеально для клиента хостинга.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LICENSE SPLIT ============ -->
+    <section style="max-width:1220px;margin:0 auto;padding:0 24px clamp(56px,8vw,88px);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:clamp(28px,4vw,52px);align-items:center;">
+        <div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;display:inline-flex;align-items:center;gap:10px;"><span style="width:24px;height:1px;background:var(--tint2);"></span>Лицензирование</span>
+          <h3 style="font-size:clamp(1.4rem,2.6vw,1.9rem);font-weight:700;letter-spacing:-.02em;color:var(--fg1);margin:14px 0 0;">Лицензия под размер фермы — по устройствам и сроку</h3>
+          <p style="color:var(--fg2);margin:14px 0 0;">Лицензия ограничена количеством ASIC и сроком действия, привязана к железу вашего сервера. Прозрачно видно использование квоты и дату окончания. Гибко: свернули часть машин — не продлеваете на простаивающие. Есть пробный период.</p>
+          <ul style="list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:11px;">
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span>Квота <b style="color:var(--fg1);">по числу устройств и сроку</b> — под текущий размер фермы.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span>Привязка к <b style="color:var(--fg1);">аппаратному отпечатку</b> сервера, офлайн-активация .lic-файлом.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.95rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:3px;"><path d="m5 12 4 4 10-10"/></svg><span><b style="color:var(--fg1);">Пробный период</b> для теста на вашем железе перед покупкой.</span></li>
+          </ul>
+        </div>
+        <div style="border:1px solid var(--b2);border-radius:14px;overflow:hidden;background:var(--raised);box-shadow:var(--shadow2);">
+          <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--b1);background:var(--sunken);"><span style="width:11px;height:11px;border-radius:50%;background:#FF5F57;"></span><span style="width:11px;height:11px;border-radius:50%;background:#FEBC2E;"></span><span style="width:11px;height:11px;border-radius:50%;background:#28C840;"></span><span style="margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--fg3);">rackgrid // лицензия</span></div>
+          <img src="assets/shot-license-dark.webp" alt="Страница лицензии RackGrid" style="display:var(--d-dark);width:100%;height:auto;">
+          <img src="assets/shot-license-light.webp" alt="Страница лицензии RackGrid" style="display:var(--d-light);width:100%;height:auto;">
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MOBILE SHOWCASE ============ -->
+    <section style="border-top:1px solid var(--b1);background:var(--raised);">
+      <div style="max-width:1220px;margin:0 auto;padding:clamp(56px,8vw,88px) 24px;">
+        <div style="text-align:center;max-width:34em;margin:0 auto 40px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;">С телефона</span>
+          <h2 style="font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700;letter-spacing:-.02em;color:var(--fg1);margin:12px 0 0;">Вся ферма — в кармане</h2>
+          <p style="color:var(--fg2);margin:12px 0 0;">Тот же интерфейс адаптируется под мобильный экран: дашборд, поиск, тепловые карты стоек и сканер сети — прямо в цеху, без отдельного приложения. Достаточно браузера.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:clamp(18px,3vw,32px);max-width:920px;margin:0 auto;">
+          <figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div style="border:6px solid var(--bstrong);border-radius:30px;overflow:hidden;background:#000;box-shadow:var(--shadow2);width:100%;"><img src="assets/phone-dashboard.png" alt="RackGrid на телефоне: дашборд" style="display:block;width:100%;height:auto;"></div>
+            <figcaption style="font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);">Дашборд</figcaption>
+          </figure>
+          <figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div style="border:6px solid var(--bstrong);border-radius:30px;overflow:hidden;background:#000;box-shadow:var(--shadow2);width:100%;"><img src="assets/phone-rack.png" alt="RackGrid на телефоне: вид стойки" style="display:block;width:100%;height:auto;"></div>
+            <figcaption style="font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);">Стойка</figcaption>
+          </figure>
+          <figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div style="border:6px solid var(--bstrong);border-radius:30px;overflow:hidden;background:#000;box-shadow:var(--shadow2);width:100%;"><img src="assets/phone-scanner.png" alt="RackGrid на телефоне: сканер сети" style="display:block;width:100%;height:auto;"></div>
+            <figcaption style="font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);">Сканер</figcaption>
+          </figure>
+          <figure style="margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div style="border:6px solid var(--bstrong);border-radius:30px;overflow:hidden;background:#000;box-shadow:var(--shadow2);width:100%;"><img src="assets/phone-license.png" alt="RackGrid на телефоне: лицензия" style="display:block;width:100%;height:auto;"></div>
+            <figcaption style="font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);">Лицензия</figcaption>
+          </figure>
+        </div>
+        <div style="text-align:center;margin-top:36px;"><a href="https://danildanil86660.github.io/RackGridLiveDemo/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--grad-diag);color:#fff;font-weight:600;font-size:.95rem;padding:12px 20px;border-radius:9px;box-shadow:0 10px 26px -10px var(--brand);">Открыть живое демо ↗</a></div>
+      </div>
+    </section>
+
+    <!-- ============ COMPARE ============ -->
+    <section id="compare" style="max-width:1220px;margin:0 auto;padding:clamp(56px,8vw,96px) 24px;">
+      <div style="margin-bottom:36px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;display:inline-flex;align-items:center;gap:10px;"><span style="width:24px;height:1px;background:var(--tint2);"></span>Свой сервер против облака</span>
+        <h2 style="font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700;letter-spacing:-.02em;color:var(--fg1);margin:14px 0 0;max-width:22em;">Почему свой сервер — это не «сложнее», а безопаснее</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;">
+        <div style="background:var(--raised);border:1px solid var(--brand);border-radius:14px;padding:26px;box-shadow:0 0 0 1px var(--tint);">
+          <h3 style="display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:700;color:var(--fg1);margin:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-hover)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><rect x="4" y="5" width="16" height="9" rx="1.5"/><path d="M2 19h20M9 19v-2M15 19v-2"/></svg>RackGrid · свой сервер</h3>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-hover);margin-top:6px;">ваш сервер · ваши данные</div>
+          <ul style="list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:13px;">
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span><b style="color:var(--fg1);">Данные фермы не покидают периметр</b> — размер, локация, хешрейт скрыты от третьих лиц.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Работает <b style="color:var(--fg1);">в изолированной сети</b>, за NAT/VPN, без выхода в интернет.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Несколько площадок через <b style="color:var(--fg1);">распределённых агентов</b>.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg2);font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span><b style="color:var(--fg1);">Дорабатывается под вашу инфраструктуру</b> — свои дашборды, интеграции, автоматика.</span></li>
+          </ul>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:14px;padding:26px;">
+          <h3 style="display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:700;color:var(--fg3);margin:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--fg4)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M6 16a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.5A4.5 4.5 0 0 1 18 16H6Z"/></svg>Облачные сервисы</h3>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fg4);margin-top:6px;">чужой сервер · чужие правила</div>
+          <ul style="list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:13px;">
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg3);font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--crit)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:2px;"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Телеметрия всей фермы хранится <b style="color:var(--fg2);">на стороне провайдера</b>.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg3);font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--crit)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:2px;"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Нужен <b style="color:var(--fg2);">постоянный доступ в интернет</b> с каждого устройства.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg3);font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--crit)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:2px;"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Сбой облака = <b style="color:var(--fg2);">слепая зона</b> по всей ферме.</span></li>
+            <li style="display:flex;gap:11px;align-items:flex-start;color:var(--fg3);font-size:.92rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--crit)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex:none;margin-top:2px;"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Только <b style="color:var(--fg2);">штатный функционал</b> платформы — кастома нет.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PLANS ============ -->
+    <section id="plans" style="max-width:1220px;margin:0 auto;padding:0 24px clamp(56px,8vw,88px);">
+      <div style="margin-bottom:36px;max-width:40em;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-hover);font-weight:600;display:inline-flex;align-items:center;gap:10px;"><span style="width:24px;height:1px;background:var(--tint2);"></span>Форматы работы</span>
+        <h2 style="font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700;letter-spacing:-.02em;color:var(--fg1);margin:14px 0 0;">От лицензии до системы под ключ</h2>
+        <p style="color:var(--fg2);margin:12px 0 0;">Начните с лицензии и пробного периода — или отдайте всё нам: развёртывание, доработку под процессы площадки и поддержку с гарантированным временем реакции.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:14px;padding:26px;display:flex;flex-direction:column;">
+          <h3 style="font-size:1.2rem;font-weight:700;color:var(--fg1);margin:0;">Лицензия</h3>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.04em;color:var(--fg3);margin-top:6px;">поставите сами за вечер</div>
+          <ul style="list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:12px;flex:1;">
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Полная версия <b style="color:var(--fg1);">под размер вашего парка</b> — от десятков до тысяч ASIC.</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span><b style="color:var(--fg1);">Пробный период 30 дней</b> на вашем железе.</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Обновления и помощь по Telegram и почте.</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Офлайн-активация .lic-файлом — интернет не нужен.</span></li>
+          </ul>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--b1);font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--fg3);">старт — в день обращения</div>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--b1);border-radius:14px;padding:26px;display:flex;flex-direction:column;">
+          <h3 style="font-size:1.2rem;font-weight:700;color:var(--fg1);margin:0;">Лицензия + внедрение</h3>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.04em;color:var(--fg3);margin-top:6px;">развернём и настроим за вас</div>
+          <ul style="list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:12px;flex:1;">
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Установка на ваш сервер, в том числе <b style="color:var(--fg1);">в изолированной сети</b>.</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Сканирование сети, разметка площадок, контейнеров и стоек.</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Настройка ролей и <b style="color:var(--fg1);">кабинетов клиентов</b>.</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Обучение диспетчеров и администраторов.</span></li>
+          </ul>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--b1);font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--fg3);">фиксированная цена за проект</div>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--brand);border-radius:14px;padding:26px;display:flex;flex-direction:column;position:relative;box-shadow:0 0 0 1px var(--tint),var(--shadow2);">
+          <span style="position:absolute;top:-11px;left:26px;font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--grad-diag);border-radius:5px;padding:4px 9px;font-weight:600;">рекомендуем</span>
+          <h3 style="font-size:1.2rem;font-weight:700;color:var(--fg1);margin:0;">Под ключ</h3>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.04em;color:var(--brand-hover);margin-top:6px;">для хостингов и крупных ферм</div>
+          <ul style="list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:12px;flex:1;">
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Всё, что во «Внедрении».</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span><b style="color:var(--fg1);">Доработка под ваши процессы</b> — биллинг, интеграции, автоматика.</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Поддержка с <b style="color:var(--fg1);">гарантированным временем реакции</b>: обновления, мониторинг, приоритет.</span></li>
+            <li style="display:flex;gap:10px;align-items:flex-start;color:var(--fg2);font-size:.9rem;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;flex:none;margin-top:2px;"><path d="m5 12 4 4 10-10"/></svg><span>Система <b style="color:var(--fg1);">развивается вместе с площадкой</b> — новые функции под ваши задачи.</span></li>
+          </ul>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--b1);font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--fg3);">цена — по составу работ</div>
+        </div>
+      </div>
+      <div style="margin-top:28px;background:var(--sunken);border:1px solid var(--b1);border-radius:14px;padding:24px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);font-weight:600;margin-bottom:14px;">Что чаще всего дорабатываем под площадку</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:.82rem;color:var(--fg2);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;"><b style="color:var(--fg1);">Биллинг хостинга</b> — тарифы и счета за электричество</span>
+          <span style="font-size:.82rem;color:var(--fg2);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;">Интеграция с <b style="color:var(--fg1);">электросчётчиками</b> (Modbus / АСКУЭ)</span>
+          <span style="font-size:.82rem;color:var(--fg2);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;"><b style="color:var(--fg1);">Telegram-бот</b> для клиентов площадки</span>
+          <span style="font-size:.82rem;color:var(--fg2);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;"><b style="color:var(--fg1);">Управляемые розетки</b> — перезагрузка ASIC из интерфейса</span>
+          <span style="font-size:.82rem;color:var(--fg2);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;"><b style="color:var(--fg1);">Отчёты и 1С</b> для бухгалтерии</span>
+          <span style="font-size:.82rem;color:var(--fg2);background:var(--raised);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;"><b style="color:var(--fg1);">Иммерсионное охлаждение</b> и нестандартные прошивки</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section style="max-width:1220px;margin:0 auto;padding:0 24px clamp(64px,9vw,110px);">
+      <div style="position:relative;overflow:hidden;border-radius:20px;background:var(--grad-diag);padding:clamp(40px,6vw,72px) clamp(24px,4vw,48px);text-align:center;box-shadow:0 24px 60px -20px var(--brand);">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.09) 1px,transparent 0) 0 0/22px 22px;pointer-events:none;"></div>
+        <div style="position:relative;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.85);font-weight:600;">Демонстрация</span>
+          <h2 style="font-size:clamp(1.6rem,3.2vw,2.3rem);font-weight:800;letter-spacing:-.02em;color:#fff;margin:14px auto 0;max-width:18em;">Покажу RackGrid вживую на вашей конфигурации</h2>
+          <p style="color:rgba(255,255,255,.9);margin:16px auto 0;max-width:40em;">Напишите, сколько у вас площадок и какое железо — проведу демо на реальных данных и предложу формат: лицензия, внедрение или под ключ с доработкой и поддержкой.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:30px;">
+            <a href="https://t.me/dan0712" style="display:inline-flex;align-items:center;gap:9px;background:#fff;color:#11141A;font-weight:700;font-size:.98rem;padding:13px 22px;border-radius:9px;"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.3-1.7.8l-4.6-3.4-2.2 2.1c-.2.2-.5.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.2 13.5l-4.5-1.4c-1-.3-1-1 .2-1.4l17.6-6.8c.8-.3 1.5.2 1.4 1.4Z"/></svg>Telegram: @dan0712</a>
+            <a href="mailto:dan0712@yandex.ru" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);color:#fff;font-weight:600;font-size:.98rem;padding:13px 20px;border-radius:9px;border:1px solid rgba(255,255,255,.3);">dan0712@yandex.ru</a>
+            <a href="https://danildanil86660.github.io/RackGridLiveDemo/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);color:#fff;font-weight:600;font-size:.98rem;padding:13px 20px;border-radius:9px;border:1px solid rgba(255,255,255,.3);">Живое демо ↗</a>
+          </div>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:.76rem;color:rgba(255,255,255,.8);margin:24px 0 0;">Разработка и внедрение систем мониторинга майнинг-ферм · <b style="color:#fff;">на вашем сервере</b></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="border-top:1px solid var(--b1);background:var(--raised);">
+    <div style="max-width:1220px;margin:0 auto;padding:26px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="width:24px;height:24px;border-radius:7px;background:var(--grad-diag);display:grid;place-items:center;color:#fff;font-weight:800;font-size:.8rem;">R</span>
+        <span style="font-size:.88rem;color:var(--fg2);">RackGrid — система управления майнинг-фермой на вашем сервере</span>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--fg4);">Antminer · Whatsminer · Vnish · и другие</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;liveMetrics&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Живая телеметрия&quot;},&quot;updateMs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:2200,&quot;min&quot;:800,&quot;max&quot;:5000,&quot;step&quot;:200,&quot;unit&quot;:&quot;мс&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Живая телеметрия&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let t = 'dark';
+    try { const s = localStorage.getItem('rg-theme'); if (s === 'dark' || s === 'light') t = s; } catch(e){}
+    this.state = { theme:t, hr:30.52, on:244, pw:0.82, ef:26.9, er:8, spark:this.seed() };
+  }
+  seed(){
+    const a = []; let v = 37.5;
+    for (let i=0;i<46;i++){ v += (Math.random()-0.5)*1.3; v = Math.max(34.8, Math.min(41.4, v)); a.push(v); }
+    return a;
+  }
+  componentDidMount(){ this.startLoop(); }
+  componentDidUpdate(prev){
+    if (prev.liveMetrics !== this.props.liveMetrics || prev.updateMs !== this.props.updateMs) this.startLoop();
+  }
+  startLoop(){
+    if (this.iv) clearInterval(this.iv);
+    if (this.props.liveMetrics === false) return;
+    const ms = Math.max(600, this.props.updateMs || 2200);
+    this.iv = setInterval(() => {
+      this.setState(s => {
+        const spark = s.spark.slice(1);
+        let last = spark.length ? spark[spark.length-1] : 37.5;
+        last += (Math.random()-0.5)*1.5; last = Math.max(34.8, Math.min(41.4, last));
+        spark.push(last);
+        return {
+          hr: +(30.5 + (Math.random()-0.5)*1.15).toFixed(2),
+          on: 240 + Math.floor(Math.random()*8),
+          pw: +(0.82 + (Math.random()-0.5)*0.05).toFixed(2),
+          ef: +(26.9 + (Math.random()-0.5)*0.8).toFixed(1),
+          er: 6 + Math.floor(Math.random()*5),
+          spark
+        };
+      });
+    }, ms);
+  }
+  componentWillUnmount(){ if (this.iv) clearInterval(this.iv); }
+  toggle(){
+    this.setState(s => {
+      const t = s.theme === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem('rg-theme', t); } catch(e){}
+      return { theme:t };
+    });
+  }
+  sparkPts(){
+    const a = this.state.spark, n = a.length, W = 260, H = 56;
+    const min = Math.min.apply(null,a), max = Math.max.apply(null,a), rng = (max-min)||1;
+    return a.map((v,i) => {
+      const x = (i/(n-1))*W;
+      const y = H - 4 - ((v-min)/rng)*(H-8);
+      return x.toFixed(1)+','+y.toFixed(1);
+    }).join(' ');
+  }
+  renderVals(){
+    const s = this.state;
+    return {
+      theme: s.theme,
+      toggle: () => this.toggle(),
+      hr: s.hr.toFixed(2),
+      on: s.on,
+      off: 315 - s.on,
+      onPct: ((s.on/315)*100).toFixed(1),
+      pw: s.pw.toFixed(2),
+      ef: s.ef.toFixed(1),
+      er: s.er,
+      erCrit: 2,
+      erWarn: s.er - 2,
+      cost: Math.round(s.pw * 1491),
+      sparkPts: this.sparkPts()
+    };
+  }
+}
+</script>
+</body>
+</html>
