@@ -27,6 +27,9 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # Сам включает Pages в режиме GitHub Actions (не нужно переключать Source вручную)
+          enablement: true
 
       - name: Upload artifact (весь корень репо — index.html в корне)
         uses: actions/upload-pages-artifact@v3
